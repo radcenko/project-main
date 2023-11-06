@@ -10,12 +10,10 @@
         </div>
         <% pictures.forEach(function(picture){ %>
             <div class="text-center">
-              <a href="/pictures/<%= picture %>">
-                <img class="mb-3" src="/<%= picture %>" style="width:10%">
-              </a>
-              <h4><%= picture %></h4>
+              <img class="mb-3" src="data:image/png; base64, <%=picture.src%>" style="width:115px">
+              <h4><%=picture.name%></h4>
             </div>
-            <% }); %>
+        <% });%>
             
         <script src="../javascripts/pictures.js"></script>
     </body>
