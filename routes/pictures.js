@@ -33,6 +33,27 @@ router.get('/', requiresAuth(), async function(req, res, next) {
 //   res.render('pictureDetails', { picture: req.params.pictureName });
 // });
 
+router.get('/:pictureName', requiresAuth(), async function(req, res, next) {
+  const pictureName = req.params.pictureName;
+  const params = {
+    Bucket: process.env.CYCLIC_BUCKET_NAME,
+    Key: `public/${pictureName}`
+  };
+
+  try {
+    // Fetch the file from S3
+    const data = await s3.getObject(params).promise();
+    // Convert the file to a Base64 string
+    const imageBase64 = Buffer.from(data.Body).toString('base64');
+    // Send the image data as a response
+    res.send(`<img src="data:image/png;base64,${imageBase64}" />`);
+  } catch (error) {
+    // Handle any errors that might occur
+    console.error("Error fetching image from S3:", error);
+    res.status(500).send('Error fetching image');
+  }
+});
+
 //display a file from the request in the logs and save in folder
 router.post('/', requiresAuth(), async function(req, res, next) {
   const file = req.files.file;
