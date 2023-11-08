@@ -8,13 +8,14 @@ const s3 = new AWS.S3();
 
 /* GET pictures listing. */
 router.get('/', requiresAuth(), async function(req, res, next) {
+  console.log(req.oidc.user);
   var params = {
     Bucket: process.env.CYCLIC_BUCKET_NAME,
     Delimiter: '/',
-    Prefix: 'public/'
+    Prefix: req.oidc.user.email + '/'
   };
   var allObjects = await s3.listObjects(params).promise();
-  var keys = allObjects?.Contents.map( x=> x.Key);
+  var keys = allObjects?.Contents.map( x=> x.Key)
   const pictures = await Promise.all(keys.map(async (key) => {
     let my_file = await s3.getObject({
       Bucket: process.env.CYCLIC_BUCKET_NAME,
@@ -27,11 +28,6 @@ router.get('/', requiresAuth(), async function(req, res, next) {
   }))
   res.render('pictures', { pictures: pictures});
 });
-
-// // Route for serving a single picture by name
-// router.get('/:pictureName', function(req, res, next) {
-//   res.render('pictureDetails', { picture: req.params.pictureName });
-// });
 
 router.get('/:pictureName', requiresAuth(), async function(req, res, next) {
   const pictureName = req.params.pictureName;
@@ -61,7 +57,7 @@ router.post('/', requiresAuth(), async function(req, res, next) {
   await s3.putObject({
     Body: file.data,
     Bucket: process.env.CYCLIC_BUCKET_NAME,
-    Key: "public/" + file.name,
+    Key: req.oidc.user.email + "/" + file.name,
   }).promise()
   res.end();
 });
