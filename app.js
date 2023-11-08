@@ -1,12 +1,11 @@
 require('dotenv').config()
+const { auth } = require('express-openid-connect');
 
 var createError = require('http-errors');
 var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
-
-const { auth } = require('express-openid-connect');
 
 const config = {
   authRequired: false,
@@ -29,11 +28,6 @@ app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
 app.use(auth(config));
-// Middleware to make the `user` object available for all views
-app.use(function (req, res, next) {
-  res.locals.user = req.oidc.user;
-  next();
-});
 app.use(fileUpload());
 app.use(logger('dev'));
 app.use(express.json());
@@ -41,6 +35,12 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.static(path.join(__dirname, 'pictures')));
+
+// Middleware to make the `user` object available for all views
+app.use(function (req, res, next) {
+  res.locals.user = req.oidc.user;
+  next();
+});
 
 app.use('/', indexRouter);
 app.use('/pictures', picturesRouter);
