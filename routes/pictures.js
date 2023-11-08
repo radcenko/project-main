@@ -8,7 +8,11 @@ const s3 = new AWS.S3();
 
 /* GET pictures listing. */
 router.get('/', requiresAuth(), async function(req, res, next) {
+<<<<<<< HEAD
   console.log(req.oidc.user);
+=======
+  console.log(req.oidc.user)
+>>>>>>> ef922a6dd92270e67c3270ae3e502325bca5cef7
   var params = {
     Bucket: process.env.CYCLIC_BUCKET_NAME,
     Delimiter: '/',
